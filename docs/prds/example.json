@@ -1,0 +1,49 @@
+{
+  "sprintName": "example-sprint",
+  "description": "Example PRD showing the shape ralph.sh and the skills expect. Delete or replace with your first real PRD at docs/prds/current.json.",
+  "contextFiles": [
+    "docs/specs/2026-01-01-example-design.md"
+  ],
+  "prerequisites": [
+    "On the base branch with a clean working tree"
+  ],
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Add a health endpoint",
+      "description": "As an operator, I want GET /healthz to return 200 so that the load balancer can detect a live instance.",
+      "acceptanceCriteria": [
+        "GET /healthz returns HTTP 200 with body 'ok'",
+        "The endpoint requires no authentication",
+        "Test: unauthenticated GET /healthz returns 200",
+        "Test: response body is exactly 'ok'",
+        "Quality gate: the project's full test command (qualityGates.testAll in workflow/config.json) passes with 0 failures"
+      ],
+      "priority": 1,
+      "passes": false,
+      "wikiPages": [],
+      "testScope": "tests/test_health.py",
+      "notes": "Keep it dependency-free; no DB round trip."
+    },
+    {
+      "id": "US-002",
+      "title": "Document the health endpoint in the runbook",
+      "description": "As a developer, I want the runbook to mention /healthz so that on-call knows what the probe hits.",
+      "acceptanceCriteria": [
+        "docs/runbook.md gains a 'Health checks' section naming /healthz",
+        "Manual: section renders correctly in the repo's markdown preview",
+        "Quality gate: the project's full test command (qualityGates.testAll in workflow/config.json) passes with 0 failures"
+      ],
+      "priority": 2,
+      "passes": false,
+      "wikiPages": ["concepts/sprint-workflow.md"],
+      "testScope": "manual"
+    }
+  ],
+  "deferred": [
+    {
+      "item": "Readiness probe that checks the database",
+      "reason": "Needs a decision on timeout budget first."
+    }
+  ]
+}

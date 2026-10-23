@@ -1,0 +1,36 @@
+{
+  "_comment": "Project-specific knobs for the sprint workflow. Every script and skill reads from here so nothing project-specific is hardcoded. Commands run from the repo root via bash.",
+
+  "projectName": "{{PROJECT_NAME}}",
+  "baseBranch": "develop",
+  "prdPath": "docs/prds/current.json",
+  "wikiDir": "docs/wiki",
+
+  "testFilePattern": "test_",
+
+  "qualityGates": {
+    "_comment": "'before' runs first (lint/format). 'test' runs only when the story has automated tests; {targets} is replaced by the story's testScope or the test files the agent touched. 'testAll' is the full suite, used by phase-review and as the PRD's last acceptance criterion. 'after' runs last (framework checks, migration checks, type checks).",
+    "before": [
+      "echo 'TODO: set qualityGates.before in workflow/config.json (e.g. ruff check . / npm run lint)'"
+    ],
+    "test": "echo 'TODO: set qualityGates.test in workflow/config.json (e.g. pytest {targets} --tb=short / npx vitest run {targets})'",
+    "testAll": "echo 'TODO: set qualityGates.testAll in workflow/config.json (e.g. pytest --tb=short / npm test)'",
+    "after": []
+  },
+
+  "preFinishGates": {
+    "_comment": "Commands sprint-finish.sh runs before merging to the base branch. Use for checks that per-story gates can miss (e.g. 'python manage.py makemigrations --check --dry-run', 'npx prisma migrate diff --exit-code').",
+    "commands": []
+  },
+
+  "testSuiteNotes": "",
+
+  "patternSkills": {
+    "_comment": "Optional. Rows become a 'read this skill first' table in every per-story prompt. Point at your own .claude/skills/<name>/SKILL.md files.",
+    "rows": []
+  },
+
+  "neverStage": [".env", ".env.local"],
+
+  "claudeExtraFlags": ["--dangerously-skip-permissions"]
+}

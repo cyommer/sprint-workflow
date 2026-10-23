@@ -1,0 +1,12 @@
+# Workflow state (rebuildable)
+workflow/workflow.db
+ralph-logs/
+
+# Claude Code user-local state; tracked content (hooks/, skills/, review-agents/, settings.json) is committed
+.claude/settings.local.json
+.claude/projects/
+.claude/worktrees/
+
+__pycache__/
+.pytest_cache/
+*.pyc

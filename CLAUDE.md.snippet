@@ -1,0 +1,54 @@
+<!-- Paste the sections below into your project's CLAUDE.md. Adjust paths if you changed workflow/config.json. -->
+
+## Knowledge Layer (Wiki)
+
+Project knowledge lives in `docs/wiki/` — entity pages, concept pages, and immutable sources. The SessionStart hook at `.claude/hooks/session-start-wiki.sh` injects `docs/wiki/index.md` and `docs/wiki/state.md` into every session automatically.
+
+**Session banner.** The hook's output is context-only, not visible in the TUI. At the start of your first reply in each new session, print a 3–4 line banner summarizing the injected state: active sprint (or "none") and the first "Next up" item from `state.md` condensed to one line. Skip it for trivial follow-ups in an obviously continuing session.
+
+**Retrieval rule.** When gathering context for a task:
+
+1. Consult `docs/wiki/index.md` (already injected). Identify 1–3 relevant entity or concept pages.
+2. Grep `docs/wiki/` for specific nouns from the task.
+3. Read only the targeted pages. Follow cross-references only when directly needed.
+
+See `docs/wiki/CONVENTIONS.md` for the schema: page size budget, link discipline, ingest / lint / query operations.
+
+## Sprint Planning Sequence
+
+**This is mandatory. Do not skip steps or offer to start implementation without a PRD.**
+
+1. **Brainstorm** → design spec (`docs/specs/`)
+2. **Write plan** → implementation plan (`docs/plans/`)
+3. **Create PRD** → `docs/prds/current.json` (use `/prd-template`)
+4. **Start sprint** → `./workflow/scripts/sprint-start.sh <name>`
+5. **Implement** → `./ralph.sh` or story by story in-session
+
+The PRD is the bridge between planning and execution. `sprint-start.sh` reads it to create the branch and DB records. `ralph.sh` reads it for story definitions. **No PRD = no sprint.** `/sprint-plan` walks all five steps in order.
+
+## Workflow Commands
+
+| Command | Purpose |
+|---------|---------|
+| `./workflow/scripts/sprint-start.sh <name>` | Create sprint branch + DB records from PRD |
+| `./ralph.sh [iterations]` | Run the implementation loop (default 5) |
+| `./workflow/scripts/sprint-finish.sh [--yes]` | Pre-finish gates, ingest gate, merge to base branch, archive PRD |
+| `./workflow/scripts/health-check.sh` | Verify DB ↔ git ↔ PRD consistency |
+| `/phase-review` | Multi-agent review of a finished sprint |
+| `/wiki-ingest` | Fold the sprint's knowledge into the wiki (required before sprint-finish) |
+| `/lint-wiki` | Wiki drift detector |
+
+## Branching Model
+
+- Sprint branches: `sprint/<sprint-name>` off the base branch (`baseBranch` in `workflow/config.json`)
+- Story branches: `US-XXX-short-description` off the sprint branch
+- After a story passes: merge story branch → sprint branch (ralph.sh does this)
+- After sprint review: merge sprint branch → base branch (`sprint-finish.sh` does this)
+- PRs from the base branch → `main` are manual
+- Never commit directly to `main` or the base branch
+
+## Workflow Configuration
+
+- `workflow/config.json` — base branch, PRD path, quality gate commands, pre-finish gates, pattern skills, files never to stage
+- `workflow/models.json` — model per stage (planning/review on the strongest model; implementation on a cheaper one)
+- `workflow/workflow.db` — SQLite index of sprint and story state. Gitignored, rebuildable from `workflow/schema.sql`. Never dump whole tables into context; query only what the task needs via `source workflow/lib.sh && db_query "SELECT ..."`.

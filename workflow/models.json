@@ -1,0 +1,8 @@
+{
+    "_comment": "Model per workflow stage. Values are passed to `claude --model`. Planning and review want the strongest model; implementation and the per-story review can use a cheaper one.",
+    "planning": "opus",
+    "implementation": "sonnet",
+    "review": "opus",
+    "story_review": "sonnet",
+    "quickfix": "sonnet"
+}
